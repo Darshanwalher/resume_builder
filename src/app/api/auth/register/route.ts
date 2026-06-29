@@ -34,7 +34,7 @@ export async function POST (req: NextRequest){
             mobile
         })
 
-        const token = genreateToken({userId: newUser._id})
+        const token = genreateToken({userId: newUser._id.toString()})
 
         const response = NextResponse.json<ApiResponse>({
             message: "User registered successfully",

@@ -5,7 +5,7 @@ import { ApiResponse } from "@/app/types/api.types";
 import { LoginBody } from "@/app/types/user.types";
 import { NextRequest, NextResponse } from "next/server";
 
-async function POST (req: NextRequest){
+export async function POST (req: NextRequest){
     try {
         await connectToDb();
 
@@ -41,7 +41,7 @@ async function POST (req: NextRequest){
         const token = genreateToken({userId: isExisted._id.toString()})
         
         const response = NextResponse.json<ApiResponse>({
-            message: "User registered successfully",
+            message: "User logged in successfully",
             success: true,
             data: {
                 user: {

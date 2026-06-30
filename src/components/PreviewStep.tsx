@@ -146,6 +146,10 @@ ${certsHTML ? `<hr><div class="sec">Certifications</div>${certsHTML}` : ""}
       return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${resumeData?.title || "Resume"}</title>
 <style>
   @page{margin:0;}
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:10pt;color:#1e293b;line-height:1.5;}
   .hdr{background:#1d4ed8;color:#fff;padding:28px 28px 20px;}
@@ -179,6 +183,10 @@ ${certsHTML ? `<div class="sec">Certifications</div>${certsHTML}` : ""}
     return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${resumeData?.title || "Resume"}</title>
 <style>
   @page{margin:0;}
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'Segoe UI',Calibri,sans-serif;font-size:10pt;color:#111;display:flex;min-height:100vh;}
   .side{width:220px;background:#1e293b;color:#e2e8f0;padding:24px 16px;flex-shrink:0;}
@@ -216,20 +224,42 @@ ${eduHTML ? `<div class="sec">Education</div>${eduHTML}` : ""}
     setDownloading(true);
     try {
       const html = getHTML();
-      const win = window.open("about:blank", "_blank");
-      if (!win) {
-        alert("Please allow pop-ups to download PDF.");
-        return;
+      
+      // Use hidden iframe to avoid popup blocker issues and flashing blank screens
+      let iframe = document.getElementById("resume-print-iframe") as HTMLIFrameElement;
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "resume-print-iframe";
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.style.width = "0";
+        iframe.style.height = "0";
+        iframe.style.border = "none";
+        iframe.style.visibility = "hidden";
+        document.body.appendChild(iframe);
       }
-      win.document.open();
-      win.document.write(html + `<script>
-        window.onload = function() {
-          window.print();
-          setTimeout(function(){ window.close(); }, 1200);
-        };
-      <\/script>`);
-      win.document.close();
-    } finally {
+      
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc) {
+        throw new Error("Could not access iframe document");
+      }
+      
+      doc.open();
+      doc.write(html);
+      doc.close();
+      
+      // Give the document time to load assets/fonts, then trigger print
+      setTimeout(() => {
+        if (iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        }
+        setDownloading(false);
+      }, 600);
+    } catch (err) {
+      console.error("Failed to generate PDF:", err);
+      alert("Failed to generate PDF. Please try again.");
       setDownloading(false);
     }
   };

@@ -3,11 +3,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getResumes, deleteResume, createResume, updateResume } from "@/apis/resume.api";
-import { getCurrentUser, logoutUser } from "@/apis/auth.api";
+import { getCurrentUser } from "@/apis/auth.api";
+import { useAuth } from "@/components/providers/AuthProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const [user, setUser] = useState<any>(null);
   const [resumes, setResumes] = useState<any[]>([]);
@@ -120,7 +122,7 @@ export default function DashboardPage() {
   };
 
   const handleLogout = async () => {
-    try { await logoutUser(); } finally { router.push("/auth/login"); }
+    await logout();
   };
 
   // ─── Loading screen ───

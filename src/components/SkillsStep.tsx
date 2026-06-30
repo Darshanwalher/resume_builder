@@ -67,7 +67,6 @@ export default function SkillsStep({
       });
 
       if (result.success && result.data) {
-        // AI route returns { skills: string[] }
         const suggested = result.data.skills || [];
         setRecommendations(suggested);
       } else {
@@ -87,35 +86,35 @@ export default function SkillsStep({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <StepHeader
         title="Technical & Soft Skills"
         description="Add keywords representing your professional abilities. Use our AI suggestion tool to generate contextual skills optimized for ATS parsing."
       />
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Left Column: Active Skills Tag Manager (7 Cols) */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-5">
           
           {/* Manual input */}
           <form onSubmit={handleManualAddSubmit} className="space-y-2">
-            <label className="block text-slate-300 text-xs font-semibold uppercase tracking-wider">
+            <label className="block text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
               Add Skill Manually
             </label>
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               <input
                 type="text"
                 value={manualInput}
                 onChange={(e) => setManualInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="flex-1 px-4 py-3 bg-slate-950/40 border border-white/[0.08] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition duration-200 text-sm"
-                placeholder="e.g. JavaScript (press Enter to add)"
+                className="flex-1 px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-muted)] text-[var(--text)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition"
+                placeholder="e.g. JavaScript (press Enter)"
               />
               <button
                 type="submit"
-                className="px-5 py-3 bg-slate-900 border border-white/[0.08] hover:bg-slate-800 text-slate-200 font-semibold rounded-xl transition cursor-pointer active:scale-[0.98]"
+                className="px-4 py-2.5 bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-muted)] text-[var(--text)] font-semibold rounded-xl transition cursor-pointer active:scale-[0.98] text-sm"
               >
                 Add
               </button>
@@ -123,20 +122,20 @@ export default function SkillsStep({
           </form>
 
           {/* Active Badge Container */}
-          <div className="bg-slate-950/20 border border-white/[0.06] rounded-3xl p-6 min-h-[160px] flex flex-wrap gap-2.5 items-start content-start shadow-xl">
+          <div className="bg-[var(--bg-muted)] border border-[var(--border)] rounded-2xl p-5 min-h-[140px] flex flex-wrap gap-2 items-start content-start">
             {skillsList.map((skill) => (
               <span
                 key={skill}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/10 border border-violet-500/25 text-violet-300 font-semibold text-xs rounded-xl shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--accent-soft)] border border-blue-500/20 text-[var(--accent-text)] font-semibold text-xs rounded-full"
               >
                 <span>{skill}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(skill)}
-                  className="text-violet-400 hover:text-white hover:bg-violet-600/20 rounded-lg p-0.5 transition cursor-pointer"
+                  className="text-[var(--text-muted)] hover:text-red-500 rounded-lg p-0.5 transition cursor-pointer"
                   title="Remove Skill"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -144,52 +143,52 @@ export default function SkillsStep({
             ))}
 
             {skillsList.length === 0 && (
-              <div className="w-full text-center py-8 text-slate-500 text-sm italic">
-                No skills added yet. Use the manual input or AI recommendations below.
+              <div className="w-full text-center py-8 text-[var(--text-muted)] text-xs italic">
+                No skills added yet. Type above or generate suggestions.
               </div>
             )}
           </div>
         </div>
 
         {/* Right Column: AI Suggestion Tool (5 Cols) */}
-        <div className="lg:col-span-5 bg-[#0f1524]/40 border border-white/[0.05] rounded-3xl p-6 shadow-xl space-y-5">
+        <div className="lg:col-span-5 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5 space-y-4">
           <div>
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center gap-1.5">
               <span>✨ AI Suggestions</span>
             </h3>
-            <p className="text-slate-500 text-[11px] mt-1 leading-relaxed">
-              Input your target job profile context to get AI recommended skills mapping.
+            <p className="text-[var(--text-muted)] text-[10px] mt-1 leading-relaxed">
+              Generate skills list mapped to your target job profile.
             </p>
           </div>
 
           {aiError && (
-            <div className="p-3 bg-red-950/40 border border-red-500/30 text-red-200 text-xs rounded-xl">
+            <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-xl">
               {aiError}
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
-              <label className="block text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-1.5">
+              <label className="block text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-1.5">
                 Target Role
               </label>
               <input
                 type="text"
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-950/50 border border-white/[0.08] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition text-xs"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-muted)] text-[var(--text)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition"
                 placeholder="e.g. Frontend Engineer"
               />
             </div>
 
             <div>
-              <label className="block text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-1.5">
+              <label className="block text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-1.5">
                 Experience Level
               </label>
               <select
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-950/50 border border-white/[0.08] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition text-xs"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-muted)] text-[var(--text)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition text-xs cursor-pointer"
               >
                 <option value="Fresher">Fresher (Entry Level)</option>
                 <option value="Mid-Level">Mid-Level</option>
@@ -201,36 +200,36 @@ export default function SkillsStep({
               type="button"
               onClick={handleFetchRecommendations}
               disabled={aiLoading}
-              className="w-full py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl hover:shadow-md hover:shadow-violet-500/10 active:scale-[0.98] transition cursor-pointer text-xs disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl active:scale-[0.98] transition cursor-pointer text-xs disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               {aiLoading ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin rounded-full" />
-                  <span>Loading Recommendations...</span>
+                  <div className="w-3.5 h-3.5 border-2 border-t-white border-r-transparent animate-spin rounded-full" />
+                  <span>Loading…</span>
                 </>
               ) : (
-                <span>Generate Recommendations</span>
+                <span>Generate Suggestions</span>
               )}
             </button>
           </div>
 
           {/* Suggested Pills Grid */}
           {recommendations.length > 0 && (
-            <div className="border-t border-white/[0.06] pt-4 space-y-3.5 animate-in fade-in slide-in-from-bottom-2 duration-150">
+            <div className="border-t border-[var(--border)] pt-3 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                   Suggested Pills
                 </span>
                 <button
                   type="button"
                   onClick={handleAddAllRecommendations}
-                  className="text-violet-400 hover:text-violet-300 text-xs font-semibold hover:underline cursor-pointer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline text-xs font-semibold cursor-pointer"
                 >
                   Add All
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto pr-1">
+              <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-0.5">
                 {recommendations.map((rec) => {
                   const alreadyAdded = skillsList.includes(rec);
                   return (
@@ -239,10 +238,10 @@ export default function SkillsStep({
                       type="button"
                       onClick={() => !alreadyAdded && handleAddSkill(rec)}
                       disabled={alreadyAdded}
-                      className={`px-2.5 py-1 text-xs rounded-lg border text-left transition cursor-pointer active:scale-[0.97] ${
+                      className={`px-2 py-0.5 text-xs rounded-lg border text-left transition cursor-pointer active:scale-[0.97] ${
                         alreadyAdded
-                          ? "bg-slate-900 border-white/[0.04] text-slate-600 cursor-default pointer-events-none"
-                          : "bg-slate-950/60 border-white/[0.06] hover:border-violet-500/30 text-slate-300 hover:text-violet-300"
+                          ? "bg-[var(--bg-muted)] border-[var(--border)] text-[var(--text-muted)] cursor-default pointer-events-none"
+                          : "bg-transparent border-[var(--border)] hover:border-blue-400 text-[var(--text)] hover:text-blue-500"
                       }`}
                     >
                       {rec} {alreadyAdded && "✓"}
@@ -256,16 +255,16 @@ export default function SkillsStep({
       </div>
 
       {/* Navigation Footer */}
-      <div className="mt-8 border-t border-white/[0.06] pt-6 flex justify-between gap-4">
+      <div className="mt-6 border-t border-[var(--border)] pt-5 flex justify-between gap-4">
         <button
           onClick={onBack}
-          className="px-6 py-3 bg-slate-900 border border-white/[0.08] hover:bg-slate-800 text-slate-300 font-semibold rounded-xl hover:shadow-md hover:shadow-black/25 active:scale-[0.98] transition cursor-pointer"
+          className="px-5 py-2.5 bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-muted)] text-[var(--text-muted)] hover:text-[var(--text)] font-semibold rounded-xl active:scale-[0.98] transition cursor-pointer text-sm"
         >
           Back
         </button>
         <button
           onClick={onNext}
-          className="px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-violet-500/10 active:scale-[0.98] transition cursor-pointer"
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl active:scale-[0.98] transition cursor-pointer text-sm"
         >
           Next: Achievements
         </button>

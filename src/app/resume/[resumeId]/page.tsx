@@ -3,8 +3,8 @@
 import React, { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getResume, updateResume } from "@/apis/resume.api";
+import ThemeToggle from "@/components/ThemeToggle";
 
-// Import step components
 import PersonalInfoStep from "@/components/PersonalInfoStep";
 import EducationStep from "@/components/EducationStep";
 import ExperienceStep from "@/components/ExperienceStep";
@@ -15,14 +15,14 @@ import SummaryStep from "@/components/SummaryStep";
 import PreviewStep from "@/components/PreviewStep";
 
 const STEPS = [
-  { name: "Personal Info", desc: "Contact details" },
-  { name: "Education", desc: "Academics" },
-  { name: "Experience", desc: "Work history" },
-  { name: "Projects", desc: "Tech portfolio" },
-  { name: "Skills", desc: "Competencies" },
-  { name: "Achievements", desc: "Certifications" },
-  { name: "AI Summary", desc: "Intro profile" },
-  { name: "Preview & PDF", desc: "Export resume" },
+  { name: "Personal Info",  desc: "Contact details" },
+  { name: "Education",      desc: "Academic background" },
+  { name: "Experience",     desc: "Work history" },
+  { name: "Projects",       desc: "Portfolio work" },
+  { name: "Skills",         desc: "Technical skills" },
+  { name: "Achievements",   desc: "Certifications" },
+  { name: "AI Summary",     desc: "Profile intro" },
+  { name: "Preview & PDF",  desc: "Export resume" },
 ];
 
 export default function ResumePage({ params }: { params: Promise<{ resumeId: string }> }) {
@@ -32,10 +32,11 @@ export default function ResumePage({ params }: { params: Promise<{ resumeId: str
   const [resumeData, setResumeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savedOk, setSavedOk] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    const fetchResume = async () => {
+    (async () => {
       try {
         const result = await getResume(resumeId);
         if (result.success && result.data) {
@@ -43,187 +44,157 @@ export default function ResumePage({ params }: { params: Promise<{ resumeId: str
         } else {
           router.push("/dashboard");
         }
-      } catch (err) {
-        console.error("Failed to load resume:", err);
+      } catch {
         router.push("/dashboard");
       } finally {
         setLoading(false);
       }
-    };
-    fetchResume();
+    })();
   }, [resumeId, router]);
 
-  const handleSave = async (updatedData = resumeData) => {
-    if (!resumeId || !updatedData) return;
+  const handleSave = async (data = resumeData) => {
+    if (!resumeId || !data) return;
     setSaving(true);
+    setSavedOk(false);
     try {
-      await updateResume(resumeId, updatedData);
-    } catch (err) {
-      console.error("Failed to auto-save resume:", err);
+      await updateResume(resumeId, data);
+      setSavedOk(true);
+    } catch {
+      /* silent */
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDataChange = (updatedFields: any) => {
-    setResumeData((prev: any) => {
-      const next = { ...prev, ...updatedFields };
-      // Debounce or save immediately when changing page sections
-      return next;
-    });
-  };
+  const handleDataChange = (fields: any) =>
+    setResumeData((prev: any) => ({ ...prev, ...fields }));
 
   const handleNext = async () => {
-    // Save current step data to database first
     await handleSave();
-    if (activeStep < STEPS.length - 1) {
-      setActiveStep((prev) => prev + 1);
-    }
+    if (activeStep < STEPS.length - 1) setActiveStep((p) => p + 1);
   };
 
   const handleBack = async () => {
     await handleSave();
-    if (activeStep > 0) {
-      setActiveStep((prev) => prev - 1);
-    }
+    if (activeStep > 0) setActiveStep((p) => p - 1);
   };
 
-  const handleSidebarClick = async (stepIndex: number) => {
+  const handleSidebarClick = async (idx: number) => {
     await handleSave();
-    setActiveStep(stepIndex);
+    setActiveStep(idx);
   };
 
-  const renderActiveStep = () => {
-    const props = {
-      resumeData,
-      onChange: handleDataChange,
-      onNext: handleNext,
-      onBack: handleBack,
-    };
-
+  const renderStep = () => {
+    const p = { resumeData, onChange: handleDataChange, onNext: handleNext, onBack: handleBack };
     switch (activeStep) {
-      case 0:
-        return <PersonalInfoStep {...props} />;
-      case 1:
-        return <EducationStep {...props} />;
-      case 2:
-        return <ExperienceStep {...props} />;
-      case 3:
-        return <ProjectSetup {...props} />;
-      case 4:
-        return <SkillsStep {...props} />;
-      case 5:
-        return <AchievementsStep {...props} />;
-      case 6:
-        return <SummaryStep {...props} />;
-      case 7:
-        return <PreviewStep {...props} />;
-      default:
-        return null;
+      case 0: return <PersonalInfoStep {...p} />;
+      case 1: return <EducationStep {...p} />;
+      case 2: return <ExperienceStep {...p} />;
+      case 3: return <ProjectSetup {...p} />;
+      case 4: return <SkillsStep {...p} />;
+      case 5: return <AchievementsStep {...p} />;
+      case 6: return <SummaryStep {...p} />;
+      case 7: return <PreviewStep {...p} />;
+      default: return null;
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070b13] flex items-center justify-center text-white select-none">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full border-2 border-violet-500/20 border-t-violet-500 animate-spin mb-4" />
-          <p className="text-slate-400 text-sm tracking-wide">Loading workspace...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
+          <p className="text-[var(--text-muted)] text-sm">Loading workspace…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#070b13] text-white flex flex-col font-sans select-none">
-      {/* Header bar */}
-      <header className="border-b border-white/[0.06] bg-[#0c101b]/60 backdrop-blur-xl px-6 py-4 flex items-center justify-between z-20">
-        <div className="flex items-center gap-4">
+    <div className="h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ─── Header ─── */}
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--bg-card)] h-13 flex items-center justify-between px-5">
+        <div className="flex items-center gap-3">
           <button
-            onClick={async () => {
-              await handleSave();
-              router.push("/dashboard");
-            }}
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition text-sm cursor-pointer"
+            onClick={async () => { await handleSave(); router.push("/dashboard"); }}
+            className="flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--text)] transition cursor-pointer text-sm"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Back to Dashboard</span>
+            <span>Dashboard</span>
           </button>
-          <div className="h-4 w-px bg-white/10" />
-          <span className="text-slate-300 font-bold max-w-[200px] sm:max-w-xs truncate">
+          <span className="text-[var(--border)] select-none">|</span>
+          <span className="font-semibold text-[var(--text)] text-sm max-w-[220px] truncate">
             {resumeData?.title || "Untitled Resume"}
           </span>
         </div>
 
-        {/* Saving indicator */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {saving ? (
-            <div className="flex items-center gap-2 text-slate-400 text-xs">
-              <div className="w-3.5 h-3.5 border border-t-slate-400 border-r-transparent border-b-transparent border-l-transparent animate-spin rounded-full" />
-              <span>Saving Changes...</span>
-            </div>
-          ) : (
-            <span className="text-emerald-400 text-xs flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 text-[var(--text-muted)] text-xs">
+              <div className="w-3.5 h-3.5 border border-t-current animate-spin rounded-full" />
+              Saving…
+            </span>
+          ) : savedOk ? (
+            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs">
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               Saved
             </span>
-          )}
+          ) : null}
+          <ThemeToggle />
         </div>
       </header>
 
-      {/* Main split layout */}
-      <div className="flex-1 flex flex-col md:flex-row relative z-10">
-        
-        {/* Left Sidebar Steps Panel */}
-        <aside className="w-full md:w-80 border-r border-white/[0.06] bg-[#0c101b]/20 p-6 flex flex-col gap-1 shrink-0 overflow-y-auto">
+      {/* ─── Body: Sidebar + Editor ─── */}
+      <div className="flex-1 flex overflow-hidden">
+
+        {/* Sidebar */}
+        <aside className="w-56 shrink-0 border-r border-[var(--border)] bg-[var(--bg-card)] overflow-y-auto py-4 px-3 flex flex-col gap-0.5">
           {STEPS.map((step, idx) => {
             const isActive = idx === activeStep;
+            const isDone = idx < activeStep;
             return (
               <button
                 key={idx}
                 onClick={() => handleSidebarClick(idx)}
-                className={`w-full text-left p-4 rounded-2xl flex items-center gap-4 transition cursor-pointer ${
+                className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl transition cursor-pointer ${
                   isActive
-                    ? "bg-violet-600/10 border border-violet-500/30 text-white"
-                    : "border border-transparent text-slate-400 hover:text-white hover:bg-white/[0.02]"
+                    ? "bg-[var(--accent-soft)] text-[var(--accent-text)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-muted)]"
                 }`}
               >
-                <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-                    isActive
-                      ? "bg-violet-600 text-white scale-110 shadow-lg shadow-violet-500/20"
-                      : "bg-slate-900 border border-white/[0.08]"
-                  }`}
-                >
-                  {idx + 1}
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : isDone
+                    ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400"
+                    : "bg-[var(--bg-muted)] border border-[var(--border)] text-[var(--text-muted)]"
+                }`}>
+                  {isDone ? (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <span>{idx + 1}</span>
+                  )}
                 </div>
-                <div>
-                  <span className="block font-semibold text-sm">{step.name}</span>
-                  <span className="block text-slate-500 text-xs mt-0.5">{step.desc}</span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold truncate leading-tight">{step.name}</p>
+                  <p className="text-[10px] opacity-60 truncate mt-0.5">{step.desc}</p>
                 </div>
               </button>
             );
           })}
         </aside>
 
-        {/* Right Editor Form Workspace */}
-        <main className="flex-1 p-6 md:p-10 max-w-4xl w-full mx-auto overflow-y-auto">
-          <div className="bg-[#0f1524]/20 border border-white/[0.04] rounded-3xl p-6 md:p-8 shadow-2xl">
-            {renderActiveStep()}
+        {/* Editor */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+          <div className="max-w-3xl mx-auto bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 md:p-8">
+            {renderStep()}
           </div>
         </main>
       </div>

@@ -2,6 +2,8 @@
 
 AI-powered resume builder with a guided step-by-step wizard, Gemini-generated content, and built-in ATS scoring.
 
+🔗 **Live Demo:** [https://resume-builder-chi-flame.vercel.app/](https://resume-builder-chi-flame.vercel.app/)
+
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)

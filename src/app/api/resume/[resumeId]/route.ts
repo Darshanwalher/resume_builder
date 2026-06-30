@@ -1,45 +1,45 @@
-import connectToDb from "@/app/lib/db";
-import { getCurrentUser } from "@/app/lib/getCurrentUser";
-import resumeModel from "@/app/models/resume.model";
-import { ApiResponse } from "@/app/types/api.types";
+import connectToDb from "@/lib/mongodb";
+import { getCurrentUser } from "@/lib/getCurrentUser";
+import resumeModel from "@/models/resume.model";
+import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req:NextRequest, {params} : {params: Promise<{resumeId: string}>}){
-    try {
-        
-        await connectToDb();
+export async function GET(req: NextRequest, { params }: { params: Promise<{ resumeId: string }> }) {
+  try {
 
-        const user = await getCurrentUser()
+    await connectToDb();
 
-        const {resumeId} = await params;
+    const user = await getCurrentUser()
 
-        const resume = await resumeModel.findOne({
-            _id: resumeId,
-            userId: user.userId
-        });
+    const { resumeId } = await params;
 
-        if(!resume){
-            return NextResponse.json<ApiResponse>({
-                success: false,
-                message: "resume nor found",
-            },{status: 404});
-        }
+    const resume = await resumeModel.findOne({
+      _id: resumeId,
+      userId: user
+    });
 
-        return NextResponse.json<ApiResponse>({
-            success: true,
-            message: "Resume fetched successfully",
-            data: resume
-        },{status: 200});
-    } catch (error) {
-
-        console.log("error in get resume api ",error);
-
-        return NextResponse.json<ApiResponse>({
-            success: false,
-            message: "Something went wrong",
-            data: {error}
-        },{status: 500});
+    if (!resume) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        message: "resume nor found",
+      }, { status: 404 });
     }
+
+    return NextResponse.json<ApiResponse>({
+      success: true,
+      message: "Resume fetched successfully",
+      data: resume
+    }, { status: 200 });
+  } catch (error) {
+
+    console.log("error in get resume api ", error);
+
+    return NextResponse.json<ApiResponse>({
+      success: false,
+      message: "Something went wrong",
+      data: { error }
+    }, { status: 500 });
+  }
 
 }
 
@@ -59,7 +59,7 @@ export async function PATCH(
     const updatedResume = await resumeModel.findOneAndUpdate(
       {
         _id: resumeId,
-        userId: user.userId,
+        userId: user,
       },
       {
         $set: body,
@@ -90,7 +90,51 @@ export async function PATCH(
     );
   } catch (error) {
     console.error("Error in update resume API:", error);
+    return NextResponse.json<ApiResponse>(
+      {
+        success: false,
+        message: "Failed to update resume",
+        data: { error },
+      },
+      { status: 500 }
+    );
+  }
+}
 
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ resumeId: string }> }
+) {
+  try {
+    await connectToDb();
+    
+    const user = await getCurrentUser();
+    const { resumeId } = await params;
+
+    const deletedResume = await resumeModel.findOneAndDelete({
+      _id: resumeId,
+      userId: user,
+    });
+
+    if (!deletedResume) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          message: "Resume not found or unauthorized",
+        },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json<ApiResponse>(
+      {
+        success: true,
+        message: "Resume deleted successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error in delete resume API:", error);
     return NextResponse.json<ApiResponse>(
       {
         success: false,

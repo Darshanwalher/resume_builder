@@ -1,5 +1,5 @@
 import mongoose, { Document } from "mongoose";
-import { Iuser } from "../types/user.types.js";
+import { Iuser } from "../types/user.types";
 import bcrypt from "bcrypt";
 
 

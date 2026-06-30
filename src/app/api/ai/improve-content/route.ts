@@ -1,20 +1,20 @@
-import { generateAiContent } from "@/app/lib/gemini";
-import { ImproveContentBody } from "@/app/types/ai.types";
-import { ApiResponse } from "@/app/types/api.types";
+import { generateAiContent } from "@/lib/gemini";
+import { ImproveContentBody } from "@/types/ai.types";
+import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest){
+export async function POST(req: NextRequest) {
     try {
-        
+
         const body: ImproveContentBody = await req.json();
 
         const { content } = body;
 
-        if(!content){
+        if (!content) {
             return NextResponse.json<ApiResponse>({
                 success: false,
                 message: "All fields are required"
-            },{status: 400});
+            }, { status: 400 });
         }
 
         const prompt = `
@@ -58,19 +58,19 @@ export async function POST(req: NextRequest){
         const improvedContent = result;
 
         return NextResponse.json<ApiResponse>({
-            success: true, 
-            message: "improvedContent created successfully", 
-            data: {improvedContent}
-        }, { status: 201})
+            success: true,
+            message: "improvedContent created successfully",
+            data: { improvedContent }
+        }, { status: 201 })
     } catch (error) {
 
-        console.log("error in improve-content api ",error);
+        console.log("error in improve-content api ", error);
 
         return NextResponse.json<ApiResponse>({
             success: false,
             message: "Something went wrong",
-            data: {error}
-        },{status: 500});
+            data: { error }
+        }, { status: 500 });
 
     }
 }

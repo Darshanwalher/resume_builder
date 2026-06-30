@@ -1,20 +1,20 @@
-import { generateAiContent } from "@/app/lib/gemini";
-import { GenerateProjectDescriptionBody } from "@/app/types/ai.types";
-import { ApiResponse } from "@/app/types/api.types";
+import { generateAiContent } from "@/lib/gemini";
+import { GenerateProjectDescriptionBody } from "@/types/ai.types";
+import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest){
+export async function POST(req: NextRequest) {
     try {
-        
-        const body:GenerateProjectDescriptionBody = await req.json();
 
-        const { experienceLevel,techStack, jobTitle } = body;
+        const body: GenerateProjectDescriptionBody = await req.json();
 
-        if(!experienceLevel|| !techStack || !jobTitle){
+        const { experienceLevel, techStack, jobTitle } = body;
+
+        if (!experienceLevel || !techStack || !jobTitle) {
             return NextResponse.json<ApiResponse>({
                 success: false,
                 message: "All fields are required"
-            },{status: 400});
+            }, { status: 400 });
         }
 
         const prompt = `
@@ -55,22 +55,22 @@ export async function POST(req: NextRequest){
             `;
 
 
-        const projectDescription  = await generateAiContent(prompt)
+        const projectDescription = await generateAiContent(prompt)
 
         return NextResponse.json<ApiResponse>({
-            success: true, 
-            message: "Project description created successfully", 
-            data: {projectDescription }
-        }, { status: 201})
+            success: true,
+            message: "Project description created successfully",
+            data: { projectDescription }
+        }, { status: 201 })
     } catch (error) {
 
-        console.log("error in generate-project-description api ",error);
+        console.log("error in generate-project-description api ", error);
 
         return NextResponse.json<ApiResponse>({
             success: false,
             message: "Something went wrong",
-            data: {error}
-        },{status: 500});
+            data: { error }
+        }, { status: 500 });
 
     }
 }

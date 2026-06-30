@@ -1,20 +1,20 @@
-import { generateAiContent } from "@/app/lib/gemini";
-import { GenerateExperienceDescriptionBody } from "@/app/types/ai.types";
-import { ApiResponse } from "@/app/types/api.types";
+import { generateAiContent } from "@/lib/gemini";
+import { GenerateExperienceDescriptionBody } from "@/types/ai.types";
+import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest){
+export async function POST(req: NextRequest) {
     try {
-        
-        const body:GenerateExperienceDescriptionBody = await req.json();
+
+        const body: GenerateExperienceDescriptionBody = await req.json();
 
         const { experienceLevel, jobRole, techStack, yearsOfExperience } = body;
 
-       if(!experienceLevel || !techStack || !jobRole || yearsOfExperience === undefined || yearsOfExperience === null){
+        if (!experienceLevel || !techStack || !jobRole || yearsOfExperience === undefined || yearsOfExperience === null) {
             return NextResponse.json<ApiResponse>({
                 success: false,
                 message: "All fields are required"
-            },{status: 400});
+            }, { status: 400 });
         }
 
         const prompt = `
@@ -63,22 +63,22 @@ export async function POST(req: NextRequest){
 
 
 
-        const workExperienceDescription  = await generateAiContent(prompt)
+        const workExperienceDescription = await generateAiContent(prompt)
 
         return NextResponse.json<ApiResponse>({
-            success: true, 
-            message: "Work Experience description created successfully", 
-            data: {workExperienceDescription }
-        }, { status: 201})
+            success: true,
+            message: "Work Experience description created successfully",
+            data: { workExperienceDescription }
+        }, { status: 201 })
     } catch (error) {
 
-        console.log("error in generate-experience-description api ",error);
+        console.log("error in generate-experience-description api ", error);
 
         return NextResponse.json<ApiResponse>({
             success: false,
             message: "Something went wrong",
-            data: {error}
-        },{status: 500});
+            data: { error }
+        }, { status: 500 });
 
     }
 }

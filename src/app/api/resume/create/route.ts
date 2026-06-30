@@ -1,14 +1,14 @@
-import connectToDb from "@/app/lib/db";
-import { getCurrentUser } from "@/app/lib/getCurrentUser";
-import resumeModel from "@/app/models/resume.model";
-import { ApiResponse } from "@/app/types/api.types";
+import connectToDb from "@/lib/mongodb";
+import { getCurrentUser } from "@/lib/getCurrentUser";
+import resumeModel from "@/models/resume.model";
+import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function POST (req: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
         await connectToDb();
-        
+
         const userId = await getCurrentUser();
 
         const newResume = await resumeModel.create({
@@ -27,16 +27,16 @@ export async function POST (req: NextRequest) {
             success: true,
             message: "Resume created successfully",
             data: newResume
-        },{status: 201});
-        
+        }, { status: 201 });
+
     } catch (error) {
-        console.log("error in create api ",error);
+        console.log("error in create api ", error);
 
         return NextResponse.json<ApiResponse>({
             success: false,
             message: "Something went wrong",
-            data: {error}
-        },{status: 500});
+            data: { error }
+        }, { status: 500 });
 
     }
 }
